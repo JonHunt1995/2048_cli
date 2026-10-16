@@ -22,17 +22,14 @@ def shift_row_or_col(board, indices, fn):
 
     for idx in indices:
         num = board[idx]
-        #print('index ', idx, num)
-        #print_board(board)
+
         if num == 0:
-            #print('skip bc 0')
             continue
         zero_indices = (i for i in indices if board[i] == 0)
         zero_to_swap = fn(zero_indices)
         if fn(idx, zero_to_swap) == idx:
-            #print('skip bc', fn, ' is at ', idx, ' not ', zero_to_swap)
             continue
-        #print('swapping', board[idx], board[zero_to_swap], 'at indices ', idx, zero_to_swap, )
+
         board[idx], board[zero_to_swap] = board[zero_to_swap], board[idx]
 
 def merge_duplicates(board, indices):
