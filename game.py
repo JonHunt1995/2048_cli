@@ -28,9 +28,11 @@ def spawn_num(game: Game, blanks: list[int]):
     next_spawn = random.choice(blanks)
     game.board[next_spawn] = 2 if random.randint(0, 100) <= 90 else 4
 
-def shift_row_or_col(game: Game, indices: list[int], fn: Callable[[list[int]], int]):
+def shift_row_or_col(game: Game, indices: list[int], fn: Callable[[list[int]], int]) -> int:
     if not [i for i, num in enumerate(indices) if game.board[num] == 0]:
-        return
+        return 0
+
+    swaps = 0
 
     for idx in indices:
         num = game.board[idx]
@@ -43,18 +45,26 @@ def shift_row_or_col(game: Game, indices: list[int], fn: Callable[[list[int]], i
             continue
 
         game.board[idx], game.board[zero_to_swap] = game.board[zero_to_swap], game.board[idx]
+        swaps += 1
+    print('shift_row_or_col swaps', swaps)
+    return swaps
 
-def merge_duplicates(game: Game, indices: list[int]):
+def merge_duplicates(game: Game, indices: list[int]) -> int:
+    swaps = 0
     for first, sec in itertools.pairwise(indices):
-        if game.board[first] == game.board[sec]:
+        if game.board[first] == game.board[sec] and game.board[first] > 0:
+            swaps += 1
             new_square = game.board[first] + game.board[sec]
             game.score += new_square
             game.highest = max(game.highest, new_square)
             game.board[first], game.board[sec] = new_square, 0
+    print('merge_duplicate swaps', swaps)
+    return swaps
 
     
-def shift_board(game: Game, vert=True, asc=True):
+def shift_board(game: Game, vert=True, asc=True) -> bool:
     fn = max if not asc else min
+    swaps = 0
     for i in range(BOARD_WIDTH):
         if not vert:
             indices = [x for x in range(i*BOARD_LENGTH, i*BOARD_LENGTH + BOARD_WIDTH)]
@@ -63,18 +73,21 @@ def shift_board(game: Game, vert=True, asc=True):
         if not asc:
             indices = indices[::-1]
 
-        shift_row_or_col(game, indices, fn)
-        merge_duplicates(game, indices)
-        shift_row_or_col(game, indices, fn)
+        swaps += shift_row_or_col(game, indices, fn)
+        swaps += merge_duplicates(game, indices)
+        swaps += shift_row_or_col(game, indices, fn)
 
-def play_turn(game: Game, command: str):
+    print('shift board swaps', swaps)
+    return swaps > 0
+
+def play_turn(game: Game, command: str) -> bool:
     match command:
         case 'w':
-            shift_board(game, vert=True, asc=True)
+            return shift_board(game, vert=True, asc=True)
         case 's':
-            shift_board(game, vert=True, asc=False)
+            return shift_board(game, vert=True, asc=False)
         case 'a':
-            shift_board(game, vert=False, asc=True)
+            return shift_board(game, vert=False, asc=True)
         case 'd':
-            shift_board(game, vert=False, asc=False)
+            return shift_board(game, vert=False, asc=False)
         

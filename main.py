@@ -13,7 +13,10 @@ def main():
             print('command not acceptable', command)
             continue
 
-        play_turn(game, command)
+        valid_turn = play_turn(game, command)
+        if not valid_turn:
+            print('Invalid turn. Please try again.')
+            continue
         blanks = get_blanks(game)
         if not blanks:
             break
