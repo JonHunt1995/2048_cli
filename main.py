@@ -1,25 +1,26 @@
 from game import *
 
 def main():
-    board = [0 for _ in range(BOARD_SIZE)]
-    game_over = False
-    board[5] = 2
+    game = Game()
+    game.board = [0 for _ in range(BOARD_SIZE)]
+    game.board[5] = 2
 
-    print_board(board)
-    while not game_over:
+    print_board(game)
+    while True:
         command = input('play turn (w=up, s=down, a=left, d=right): ')
-        if command not in'wasd':
+
+        if command not in list('wasd'):
             print('command not acceptable', command)
             continue
-        play_turn(board, command)
-        blanks = get_blanks(board)
-        if not blanks:
-            game_over = True
-            break
-        spawn_num(board, blanks)
-        print('\n'*3)
-        print_board(board)
 
-    print_board(board)
+        play_turn(game, command)
+        blanks = get_blanks(game)
+        if not blanks:
+            break
+        spawn_num(game, blanks)
+        print('\n'*3)
+        print_board(game)
+
+    print_board(game)
 
 main()
